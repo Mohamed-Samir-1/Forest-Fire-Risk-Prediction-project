@@ -10,13 +10,24 @@ import plotly.graph_objects as go
 
 
 # ============================================================
-# LOAD FINAL MODEL
+# LOAD FINAL MODELS
 # ============================================================
 
 model_config = joblib.load("forest_fire_final_model.pkl")
 
+# Final XGBoost model
 model = model_config["model"]
+
+# Decision Tree model
+dt_model = model_config["dt_model"]
+
+# SVM model
+svm_model = model_config["svm_model"]
+
+# Top-10 features used by all models
 features = model_config["features"]
+
+# Final Fire / No Fire decision threshold
 threshold = model_config["threshold"]
 
 
@@ -37,6 +48,7 @@ st.set_page_config(
 # ============================================================
 
 def reset_inputs():
+
     st.session_state["precmax"] = 0.0
     st.session_state["precsum"] = 0.0
     st.session_state["precmin"] = 0.0
@@ -92,9 +104,7 @@ st.markdown(
         );
 
     border-radius: 28px;
-
     padding: 34px 42px;
-
     margin-bottom: 30px;
 
     border: 1px solid rgba(255,255,255,0.25);
@@ -108,24 +118,17 @@ st.markdown(
 
 .hero-title {
     color: #ffffff !important;
-
     font-size: 44px;
-
     font-weight: 850;
-
     line-height: 1.15;
 }
 
 
 .hero-subtitle {
     color: #dff6ff !important;
-
     font-size: 18px;
-
     font-weight: 600;
-
     line-height: 1.6;
-
     margin-top: 10px;
 }
 
@@ -136,13 +139,10 @@ st.markdown(
 
 .section-title {
     color: #ffffff !important;
-
     font-size: 28px;
-
     font-weight: 850;
 
     margin-top: 20px;
-
     margin-bottom: 20px;
 
     text-shadow:
@@ -156,6 +156,7 @@ st.markdown(
 
 div[data-testid="stNumberInput"],
 div[data-testid="stTextInput"] {
+
     background:
         rgba(255,255,255,0.14) !important;
 
@@ -181,8 +182,8 @@ div[data-testid="stTextInput"] {
    ============================================================ */
 
 div[data-testid="stNumberInput"] label,
-div[data-testid="stTextInput"] label,
-div[data-testid="stDateInput"] label {
+div[data-testid="stTextInput"] label {
+
     color: #ffffff !important;
 
     font-size: 16px !important;
@@ -202,6 +203,7 @@ div[data-testid="stDateInput"] label {
 
 div[data-testid="stNumberInput"] input,
 div[data-testid="stTextInput"] input {
+
     background:
         linear-gradient(
             135deg,
@@ -237,6 +239,7 @@ div[data-testid="stTextInput"] input {
 
 div[data-testid="stNumberInput"] input:focus,
 div[data-testid="stTextInput"] input:focus {
+
     border:
         2px solid #38bdf8 !important;
 
@@ -251,6 +254,7 @@ div[data-testid="stTextInput"] input:focus {
    ============================================================ */
 
 div[data-testid="stNumberInput"] button {
+
     background:
         #082f49 !important;
 
@@ -263,6 +267,7 @@ div[data-testid="stNumberInput"] button {
 
 
 div[data-testid="stNumberInput"] button:hover {
+
     background:
         #0c4a6e !important;
 }
@@ -273,6 +278,7 @@ div[data-testid="stNumberInput"] button:hover {
    ============================================================ */
 
 .range-text {
+
     color:
         #bae6fd !important;
 
@@ -298,6 +304,7 @@ div[data-testid="stNumberInput"] button:hover {
    ============================================================ */
 
 div[data-testid="stExpander"] {
+
     background:
         rgba(255,255,255,0.94);
 
@@ -315,6 +322,7 @@ div[data-testid="stExpander"] h1,
 div[data-testid="stExpander"] h2,
 div[data-testid="stExpander"] h3,
 div[data-testid="stExpander"] strong {
+
     color:
         #082f49 !important;
 }
@@ -325,6 +333,7 @@ div[data-testid="stExpander"] strong {
    ============================================================ */
 
 div.stButton > button {
+
     width:
         100%;
 
@@ -365,6 +374,7 @@ div.stButton > button {
 
 
 div.stButton > button:hover {
+
     transform:
         translateY(-2px);
 
@@ -374,10 +384,11 @@ div.stButton > button:hover {
 
 
 /* ============================================================
-   RISK CARD
+   FINAL RESULT CARD
    ============================================================ */
 
 .result-card {
+
     border-radius:
         26px;
 
@@ -402,6 +413,7 @@ div.stButton > button:hover {
 
 
 .low-risk {
+
     background:
         linear-gradient(
             135deg,
@@ -415,19 +427,21 @@ div.stButton > button:hover {
 
 
 .medium-risk {
+
     background:
         linear-gradient(
             135deg,
-            rgba(180,83,9,0.94),
-            rgba(245,158,11,0.68)
+            rgba(217,119,6,0.92),
+            rgba(251,191,36,0.68)
         );
 
     border:
-        1px solid rgba(254,215,170,0.45);
+        1px solid rgba(254,215,170,0.55);
 }
 
 
 .high-risk {
+
     background:
         linear-gradient(
             135deg,
@@ -441,6 +455,7 @@ div.stButton > button:hover {
 
 
 .risk-icon {
+
     font-size:
         52px;
 
@@ -450,6 +465,7 @@ div.stButton > button:hover {
 
 
 .risk-title {
+
     color:
         #ffffff !important;
 
@@ -462,6 +478,7 @@ div.stButton > button:hover {
 
 
 .risk-description {
+
     color:
         #ffffff !important;
 
@@ -474,12 +491,190 @@ div.stButton > button:hover {
 
 
 /* ============================================================
+   MODEL COMPARISON CARDS
+   ============================================================ */
+
+.model-card {
+
+    border-radius:
+        24px;
+
+    padding:
+        26px 20px;
+
+    text-align:
+        center;
+
+    min-height:
+        245px;
+
+    box-shadow:
+        0 15px 35px rgba(0,0,0,0.25);
+
+    backdrop-filter:
+        blur(10px);
+
+    border:
+        2px solid rgba(255,255,255,0.40);
+}
+
+
+/* LOW RISK */
+.model-card-low {
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(5,150,105,0.95),
+            rgba(16,185,129,0.76)
+        );
+
+    border-color:
+        rgba(167,243,208,0.70);
+}
+
+
+/* MEDIUM RISK */
+.model-card-medium {
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(217,119,6,0.90),
+            rgba(251,191,36,0.68)
+        );
+
+    border-color:
+        rgba(254,215,170,0.70);
+}
+
+
+/* HIGH RISK */
+.model-card-high {
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(185,28,28,0.96),
+            rgba(239,68,68,0.78)
+        );
+
+    border-color:
+        rgba(254,202,202,0.65);
+}
+
+
+.model-name {
+
+    color:
+        #ffffff !important;
+
+    font-size:
+        22px;
+
+    font-weight:
+        900;
+
+    margin-bottom:
+        22px;
+}
+
+
+.model-risk {
+
+    color:
+        #ffffff !important;
+
+    font-size:
+        23px;
+
+    font-weight:
+        850;
+
+    margin-bottom:
+        20px;
+}
+
+
+.model-status {
+
+    color:
+        #ffffff !important;
+
+    font-size:
+        18px;
+
+    font-weight:
+        800;
+
+    margin-top:
+        10px;
+}
+
+
+/* ============================================================
+   VOTE CARDS
+   ============================================================ */
+
+.vote-card {
+
+    border-radius:
+        22px;
+
+    padding:
+        24px;
+
+    text-align:
+        center;
+
+    box-shadow:
+        0 12px 30px rgba(0,0,0,0.22);
+
+    background:
+        rgba(255,255,255,0.94);
+
+    border:
+        1px solid rgba(255,255,255,0.75);
+}
+
+
+.vote-number {
+
+    color:
+        #082f49 !important;
+
+    font-size:
+        36px;
+
+    font-weight:
+        900;
+
+    margin-top:
+        6px;
+}
+
+
+.vote-label {
+
+    color:
+        #075985 !important;
+
+    font-size:
+        15px;
+
+    font-weight:
+        800;
+}
+
+
+/* ============================================================
    METRIC CARDS
    ============================================================ */
 
 .metric-card {
+
     background:
-        rgba(255,255,255,0.92);
+        rgba(255,255,255,0.94);
 
     border:
         1px solid rgba(255,255,255,0.70);
@@ -502,6 +697,7 @@ div.stButton > button:hover {
 
 
 .metric-label {
+
     color:
         #075985 !important;
 
@@ -514,17 +710,18 @@ div.stButton > button:hover {
 
 
 .metric-value {
+
     color:
         #052f4a !important;
 
     font-size:
-        27px;
+        25px;
 
     font-weight:
         850;
 
     margin-top:
-        7px;
+        8px;
 }
 
 
@@ -533,6 +730,7 @@ div.stButton > button:hover {
    ============================================================ */
 
 .footer {
+
     text-align:
         center;
 
@@ -582,7 +780,9 @@ st.markdown(
 # ============================================================
 
 st.markdown(
-    '<div class="section-title">🌍 الظروف البيئية والجغرافية</div>',
+    '<div class="section-title">'
+    '🌍 الظروف البيئية والجغرافية'
+    '</div>',
     unsafe_allow_html=True
 )
 
@@ -609,7 +809,9 @@ with col1:
     )
 
     st.markdown(
-        '<div class="range-text">🌐 Global Range: 0+ mm</div>',
+        '<div class="range-text">'
+        '🌐 Global Range: 0+ mm'
+        '</div>',
         unsafe_allow_html=True
     )
 
@@ -623,7 +825,9 @@ with col1:
     )
 
     st.markdown(
-        '<div class="range-text">🌐 Global Range: 0+ mm</div>',
+        '<div class="range-text">'
+        '🌐 Global Range: 0+ mm'
+        '</div>',
         unsafe_allow_html=True
     )
 
@@ -637,7 +841,9 @@ with col1:
     )
 
     st.markdown(
-        '<div class="range-text">🌐 Global Range: 0+ mm</div>',
+        '<div class="range-text">'
+        '🌐 Global Range: 0+ mm'
+        '</div>',
         unsafe_allow_html=True
     )
 
@@ -651,7 +857,9 @@ with col1:
     )
 
     st.markdown(
-        '<div class="range-text">🌐 Global Range: -1.00 – +1.00 Index</div>',
+        '<div class="range-text">'
+        '🌐 Global Range: -1.00 – +1.00 Index'
+        '</div>',
         unsafe_allow_html=True
     )
 
@@ -671,7 +879,9 @@ with col2:
     )
 
     st.markdown(
-        '<div class="range-text">🌐 Global Range: -1.00 – +1.00 Index</div>',
+        '<div class="range-text">'
+        '🌐 Global Range: -1.00 – +1.00 Index'
+        '</div>',
         unsafe_allow_html=True
     )
 
@@ -685,7 +895,9 @@ with col2:
     )
 
     st.markdown(
-        '<div class="range-text">🌐 Global Range: 0+ Day</div>',
+        '<div class="range-text">'
+        '🌐 Global Range: 0+ Day'
+        '</div>',
         unsafe_allow_html=True
     )
 
@@ -699,7 +911,9 @@ with col2:
     )
 
     st.markdown(
-        '<div class="range-text">🌐 Global Range: -90° – +90°</div>',
+        '<div class="range-text">'
+        '🌐 Global Range: -90° – +90°'
+        '</div>',
         unsafe_allow_html=True
     )
 
@@ -713,7 +927,9 @@ with col2:
     )
 
     st.markdown(
-        '<div class="range-text">🌐 Global Range: 0° – 90°</div>',
+        '<div class="range-text">'
+        '🌐 Global Range: 0° – 90°'
+        '</div>',
         unsafe_allow_html=True
     )
 
@@ -723,7 +939,9 @@ with col2:
 # ============================================================
 
 st.markdown(
-    '<div class="section-title">📅 التاريخ</div>',
+    '<div class="section-title">'
+    '📅 التاريخ'
+    '</div>',
     unsafe_allow_html=True
 )
 
@@ -737,7 +955,9 @@ date_input = st.text_input(
 
 
 st.markdown(
-    '<div class="range-text">🌐 Global Range: Any valid date | أي تاريخ صالح</div>',
+    '<div class="range-text">'
+    '🌐 Global Range: Any valid date | أي تاريخ صالح'
+    '</div>',
     unsafe_allow_html=True
 )
 
@@ -850,7 +1070,6 @@ if predict_clicked:
         )
 
         year = selected_date.year
-
         day_of_year = selected_date.dayofyear
 
     except (ValueError, TypeError):
@@ -885,28 +1104,114 @@ if predict_clicked:
     )
 
 
-    # Make sure feature order matches the saved final model
+    # Make sure all models receive the same Top-10 features
     input_df = input_df[features]
 
 
     # ========================================================
-    # MODEL PREDICTION
+    # MODEL PREDICTIONS
     # ========================================================
 
-    fire_probability = model.predict_proba(
+    # XGBoost probability
+    xgb_probability = model.predict_proba(
         input_df
     )[0][1]
 
 
-    # Apply the final validated threshold
-    prediction = int(
-        fire_probability >= threshold
+    # Decision Tree prediction
+    dt_prediction = int(
+        dt_model.predict(input_df)[0]
+    )
+
+
+    # SVM prediction
+    svm_prediction = int(
+        svm_model.predict(input_df)[0]
+    )
+
+
+    # XGBoost final prediction
+    xgb_prediction = int(
+        xgb_probability >= threshold
     )
 
 
     # ========================================================
-    # RISK LEVEL
+    # MODEL VOTES
     # ========================================================
+
+    fire_votes = (
+        xgb_prediction
+        + dt_prediction
+        + svm_prediction
+    )
+
+    no_fire_votes = 3 - fire_votes
+
+
+    # ========================================================
+    # RISK LEVEL FUNCTION
+    # ========================================================
+
+    def get_risk_level(probability):
+
+        if probability < 0.30:
+
+            return {
+                "level": "LOW RISK",
+                "arabic": "خطر منخفض",
+                "emoji": "🟢",
+                "class": "model-card-low"
+            }
+
+        elif probability < 0.75:
+
+            return {
+                "level": "MEDIUM RISK",
+                "arabic": "خطر متوسط",
+                "emoji": "🟠",
+                "class": "model-card-medium"
+            }
+
+        else:
+
+            return {
+                "level": "HIGH RISK",
+                "arabic": "خطر مرتفع",
+                "emoji": "🔴",
+                "class": "model-card-high"
+            }
+
+
+    # Risk levels for each model
+    xgb_risk = get_risk_level(xgb_probability)
+
+    # For DT and SVM, convert their predictions into
+    # a simple probability-like status for risk display.
+    # Their actual probabilities are NOT displayed.
+    dt_risk = (
+        get_risk_level(1.0)
+        if dt_prediction == 1
+        else get_risk_level(0.0)
+    )
+
+    svm_risk = (
+        get_risk_level(1.0)
+        if svm_prediction == 1
+        else get_risk_level(0.0)
+    )
+
+
+    # ========================================================
+    # FINAL XGBOOST RESULT
+    # ========================================================
+
+    fire_probability = xgb_probability
+
+    probability_percent = (
+        fire_probability * 100
+    )
+
 
     if fire_probability < 0.30:
 
@@ -932,7 +1237,7 @@ if predict_clicked:
         )
 
         risk_class = "medium-risk"
-        emoji = "🟡"
+        emoji = "🟠"
         gauge_color = "#f59e0b"
 
 
@@ -951,20 +1256,231 @@ if predict_clicked:
 
 
     # ========================================================
-    # RESULT SECTION TITLE
+    # RESULTS TITLE
     # ========================================================
 
     st.markdown(
-        '<div class="section-title">🎯 نتيجة التنبؤ</div>',
+        '<div class="section-title">'
+        '🎯 نتائج التنبؤ — مقارنة بين النماذج'
+        '</div>',
         unsafe_allow_html=True
     )
 
 
     # ========================================================
-    # PROBABILITY
+    # MODEL COMPARISON CARDS
     # ========================================================
 
-    probability_percent = fire_probability * 100
+    model_col1, model_col2, model_col3 = st.columns(3)
+
+
+    # --------------------------------------------------------
+    # DECISION TREE
+    # --------------------------------------------------------
+
+    with model_col1:
+
+        dt_status = (
+            "🔥 حريق متوقع"
+            if dt_prediction == 1
+            else "✅ لا يوجد حريق"
+        )
+
+        dt_card = (
+            f'<div class="model-card {dt_risk["class"]}">'
+
+            '<div class="model-name">'
+            '🌳 Decision Tree'
+            '</div>'
+
+            '<div class="model-risk">'
+            f'{dt_risk["emoji"]} {dt_risk["arabic"]}'
+            '</div>'
+
+            '<div class="model-status">'
+            f'{dt_status}'
+            '</div>'
+
+            '</div>'
+        )
+
+        st.markdown(
+            dt_card,
+            unsafe_allow_html=True
+        )
+
+
+    # --------------------------------------------------------
+    # SVM
+    # --------------------------------------------------------
+
+    with model_col2:
+
+        svm_status = (
+            "🔥 حريق متوقع"
+            if svm_prediction == 1
+            else "✅ لا يوجد حريق"
+        )
+
+        svm_card = (
+            f'<div class="model-card {svm_risk["class"]}">'
+
+            '<div class="model-name">'
+            '🧮 SVM'
+            '</div>'
+
+            '<div class="model-risk">'
+            f'{svm_risk["emoji"]} {svm_risk["arabic"]}'
+            '</div>'
+
+            '<div class="model-status">'
+            f'{svm_status}'
+            '</div>'
+
+            '</div>'
+        )
+
+        st.markdown(
+            svm_card,
+            unsafe_allow_html=True
+        )
+
+
+    # --------------------------------------------------------
+    # XGBOOST
+    # --------------------------------------------------------
+
+    with model_col3:
+
+        xgb_status = (
+            "🔥 حريق متوقع"
+            if xgb_prediction == 1
+            else "✅ لا يوجد حريق"
+        )
+
+        xgb_card = (
+            f'<div class="model-card {xgb_risk["class"]}">'
+
+            '<div class="model-name">'
+            '🚀 XGBoost'
+            '</div>'
+
+            '<div class="model-risk">'
+            f'{xgb_risk["emoji"]} {xgb_risk["arabic"]}'
+            '</div>'
+
+            '<div class="model-status">'
+            f'{xgb_status}'
+            '</div>'
+
+            '</div>'
+        )
+
+        st.markdown(
+            xgb_card,
+            unsafe_allow_html=True
+        )
+
+
+    # ========================================================
+    # MODEL VOTE SUMMARY
+    # ========================================================
+
+    st.markdown(
+        '<div class="section-title">'
+        '🗳️ عدد الموديلات لكل توقع'
+        '</div>',
+        unsafe_allow_html=True
+    )
+
+
+    vote_col1, vote_col2 = st.columns(2)
+
+
+    # FIRE VOTES
+    with vote_col1:
+
+        fire_vote_card = (
+            '<div class="vote-card">'
+
+            '<div class="vote-label">'
+            '🔥 Fire Predictions'
+            '</div>'
+
+            f'<div class="vote-number">'
+            f'{fire_votes} / 3'
+            '</div>'
+
+            '<div class="vote-label">'
+            'عدد الموديلات التي توقعت وجود حريق'
+            '</div>'
+
+            '</div>'
+        )
+
+        st.markdown(
+            fire_vote_card,
+            unsafe_allow_html=True
+        )
+
+
+    # NO FIRE VOTES
+    with vote_col2:
+
+        no_fire_vote_card = (
+            '<div class="vote-card">'
+
+            '<div class="vote-label">'
+            '✅ No Fire Predictions'
+            '</div>'
+
+            f'<div class="vote-number">'
+            f'{no_fire_votes} / 3'
+            '</div>'
+
+            '<div class="vote-label">'
+            'عدد الموديلات التي توقعت عدم وجود حريق'
+            '</div>'
+
+            '</div>'
+        )
+
+        st.markdown(
+            no_fire_vote_card,
+            unsafe_allow_html=True
+        )
+
+
+    # ========================================================
+    # XGBOOST PROBABILITY
+    # ========================================================
+
+    st.markdown(
+        '<div class="section-title">'
+        '📊 XGBoost Fire Probability'
+        '</div>',
+        unsafe_allow_html=True
+    )
+
+
+    probability_card = (
+        '<div class="vote-card">'
+
+        '<div class="vote-label">'
+        '🔥 احتمال الحريق حسب XGBoost'
+        '</div>'
+
+        f'<div class="vote-number">'
+        f'{probability_percent:.2f}%'
+        '</div>'
+
+        '</div>'
+    )
+
+    st.markdown(
+        probability_card,
+        unsafe_allow_html=True
+    )
 
 
     # ========================================================
@@ -973,6 +1489,7 @@ if predict_clicked:
 
     fig = go.Figure(
         go.Indicator(
+
             mode="gauge+number",
 
             value=probability_percent,
@@ -1000,6 +1517,7 @@ if predict_clicked:
             },
 
             gauge={
+
                 "axis": {
                     "range": [0, 100],
                     "tickwidth": 1,
@@ -1021,6 +1539,7 @@ if predict_clicked:
                     "#94a3b8",
 
                 "steps": [
+
                     {
                         "range": [0, 30],
                         "color":
@@ -1038,9 +1557,11 @@ if predict_clicked:
                         "color":
                             "rgba(239,68,68,0.20)"
                     }
+
                 ],
 
                 "threshold": {
+
                     "line": {
                         "color": "#0f172a",
                         "width": 3
@@ -1058,6 +1579,7 @@ if predict_clicked:
 
 
     fig.update_layout(
+
         height=350,
 
         margin={
@@ -1073,12 +1595,9 @@ if predict_clicked:
     )
 
 
-    # Display gauge
     st.plotly_chart(
         fig,
-
         use_container_width=True,
-
         config={
             "displayModeBar": False
         }
@@ -1086,16 +1605,36 @@ if predict_clicked:
 
 
     # ========================================================
-    # RISK RESULT
+    # FINAL XGBOOST RESULT
     # ========================================================
 
+    st.markdown(
+        '<div class="section-title">'
+        '🔥 النتيجة النهائية — XGBoost'
+        '</div>',
+        unsafe_allow_html=True
+    )
+
+
     result_html = (
+
         f'<div class="result-card {risk_class}">'
-        f'<div class="risk-icon">{emoji}</div>'
-        f'<div class="risk-title">{risk_level} — {risk_ar}</div>'
-        f'<div class="risk-description">{risk_message}</div>'
+
+        f'<div class="risk-icon">'
+        f'{emoji}'
+        f'</div>'
+
+        f'<div class="risk-title">'
+        f'{risk_level} — {risk_ar}'
+        f'</div>'
+
+        f'<div class="risk-description">'
+        f'{risk_message}'
+        f'</div>'
+
         f'</div>'
     )
+
 
     st.markdown(
         result_html,
@@ -1104,30 +1643,33 @@ if predict_clicked:
 
 
     # ========================================================
-    # METRICS
+    # FINAL METRICS
     # ========================================================
 
     metric1, metric2, metric3 = st.columns(3)
 
 
-    # --------------------------------------------------------
-    # Prediction
-    # --------------------------------------------------------
-
+    # Final XGBoost Prediction
     with metric1:
 
         prediction_text = (
             "🔥 FIRE"
-            if prediction == 1
+            if xgb_prediction == 1
             else "✅ NO FIRE"
         )
 
         metric_html = (
+
             '<div class="metric-card">'
+
             '<div class="metric-label">'
-            'Prediction | التنبؤ'
+            'Final XGBoost Prediction | التنبؤ النهائي'
             '</div>'
-            f'<div class="metric-value">{prediction_text}</div>'
+
+            f'<div class="metric-value">'
+            f'{prediction_text}'
+            '</div>'
+
             '</div>'
         )
 
@@ -1137,18 +1679,21 @@ if predict_clicked:
         )
 
 
-    # --------------------------------------------------------
-    # Probability
-    # --------------------------------------------------------
-
+    # XGBoost Probability
     with metric2:
 
         metric_html = (
+
             '<div class="metric-card">'
+
             '<div class="metric-label">'
-            'Probability | الاحتمالية'
+            'XGBoost Probability | الاحتمالية'
             '</div>'
-            f'<div class="metric-value">{probability_percent:.2f}%</div>'
+
+            f'<div class="metric-value">'
+            f'{probability_percent:.2f}%'
+            '</div>'
+
             '</div>'
         )
 
@@ -1158,18 +1703,21 @@ if predict_clicked:
         )
 
 
-    # --------------------------------------------------------
-    # Risk Level
-    # --------------------------------------------------------
-
+    # Final Risk Level
     with metric3:
 
         metric_html = (
+
             '<div class="metric-card">'
+
             '<div class="metric-label">'
-            'Risk Level | مستوى الخطر'
+            'Final Risk Level | مستوى الخطر'
             '</div>'
-            f'<div class="metric-value">{risk_ar}</div>'
+
+            f'<div class="metric-value">'
+            f'{risk_ar}'
+            '</div>'
+
             '</div>'
         )
 
@@ -1192,18 +1740,40 @@ if predict_clicked:
         )
 
         st.write(
-            f"**Fire Probability | احتمال الحريق:** "
-            f"{probability_percent:.2f}%"
+            f"**Decision Threshold | حد القرار:** "
+            f"{threshold:.2f}"
         )
 
         st.write(
-            f"**Prediction | التنبؤ:** "
-            f"{'Fire' if prediction == 1 else 'No Fire'}"
+            f"**XGBoost Probability | احتمال الحريق:** "
+            f"{xgb_probability * 100:.2f}%"
         )
 
         st.write(
-            f"**Risk Level | مستوى الخطر:** "
-            f"{risk_ar}"
+            f"**XGBoost Prediction:** "
+            f"{'Fire' if xgb_prediction == 1 else 'No Fire'}"
+        )
+
+        st.write(
+            f"**Decision Tree Prediction:** "
+            f"{'Fire' if dt_prediction == 1 else 'No Fire'}"
+        )
+
+        st.write(
+            f"**SVM Prediction:** "
+            f"{'Fire' if svm_prediction == 1 else 'No Fire'}"
+        )
+
+        st.write(
+            f"**Fire Votes:** {fire_votes} / 3"
+        )
+
+        st.write(
+            f"**No Fire Votes:** {no_fire_votes} / 3"
+        )
+
+        st.write(
+            f"**Risk Level:** {risk_ar}"
         )
 
 
@@ -1215,7 +1785,9 @@ st.divider()
 
 
 st.markdown(
-    '<div class="section-title">🔄 توقع حالة جديدة</div>',
+    '<div class="section-title">'
+    '🔄 توقع حالة جديدة'
+    '</div>',
     unsafe_allow_html=True
 )
 
@@ -1232,12 +1804,17 @@ st.button(
 # ============================================================
 
 footer_html = (
+
     '<div class="footer">'
+
     '🔥 Forest Fire Risk Prediction'
     '<br>'
-    'XGBoost Machine Learning Project'
+
+    'XGBoost + Decision Tree + SVM'
+
     '</div>'
 )
+
 
 st.markdown(
     footer_html,
